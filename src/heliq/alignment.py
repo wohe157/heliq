@@ -33,13 +33,14 @@ def centerOfMass(data: np.ndarray) -> np.ndarray:
             object.
     """
     if data.ndim != 3:
-        raise ValueError(f"Expected a 3D input array, but got {data.ndim:d} dimensions.")
+        raise ValueError(("Expected a 3D input array, "
+                          f"but got {data.ndim:d} dimensions."))
 
     return np.asarray(center_of_mass(data))[[1, 0, 2]]
 
 
 def helicalAxisPca(data: np.ndarray, threshold: float) -> np.ndarray:
-    """Calculate the orientation of the helical axis of a 3D object using PCA
+    """Estimate the orientation of the helical axis of a 3D object using PCA
 
     The helical axis is assumed to be along the longest direction of the
     object. This is often true for rods, wires or similar shapes, but is not
@@ -66,18 +67,19 @@ def helicalAxisPca(data: np.ndarray, threshold: float) -> np.ndarray:
             axis.
     """
     if data.ndim != 3:
-        raise ValueError(f"Expected a 3D input array, but got {data.ndim:d} dimensions.")
+        raise ValueError(("Expected a 3D input array, "
+                          f"but got {data.ndim:d} dimensions."))
 
-    points = np.argwhere(data > threshold)[:, (1, 0, 2)]  # change from (y,x,z) to (x,y,z)
+    points = np.argwhere(data > threshold)[:, (1, 0, 2)]  # (y,x,z) to (x,y,z)
     covariancematrix = np.cov(points.T)
     eigval, eigvec = np.linalg.eig(covariancematrix)
 
-    orientation = eigvec[:, np.argmax(eigval)]  # get eigenvector with largest eigenvalue
+    orientation = eigvec[:, np.argmax(eigval)]
     return orientation / np.linalg.norm(orientation)
 
 
 def alignHelicalAxis(data: np.ndarray, orientation: np.ndarray,
-                     center: np.ndarray ) -> np.ndarray:
+                     center: np.ndarray) -> np.ndarray:
     """Transform a 3D object to align its helical axis to the z-axis
 
     Arguments:
@@ -102,11 +104,14 @@ def alignHelicalAxis(data: np.ndarray, orientation: np.ndarray,
     orientation = np.asarray(orientation)
     center = np.asarray(center)
     if data.ndim != 3:
-        raise ValueError(f"Expected data to be a 3D input array, but got {data.ndim:d} dimensions.")
+        raise ValueError(("Expected data to be a 3D input array, "
+                          f"but got {data.ndim:d} dimensions."))
     if orientation.ndim != 1 or orientation.shape[0] != 3:
-        raise ValueError(f"Expected orientation to have shape (3,), but got {orientation.shape}.")
+        raise ValueError(("Expected orientation to have shape (3,), "
+                          f"but got {orientation.shape}."))
     if center.ndim != 1 or center.shape[0] != 3:
-        raise ValueError(f"Expected center to have shape (3,), but got {center.shape}.")
+        raise ValueError(("Expected center to have shape (3,), "
+                          f"but got {center.shape}."))
     if np.linalg.norm(orientation) < 1e-7:
         raise ValueError("The orientation must contain nonzero elements.")
 
