@@ -149,4 +149,4 @@ def alignHelicalAxis(data: np.ndarray, orientation: np.ndarray,
     z += center[2]
 
     # Interpolate data
-    return map_coordinates(data, np.stack((y, x, z), axis=0))
+    return map_coordinates(data, (y, x, z), order=1)  # linear interpolation

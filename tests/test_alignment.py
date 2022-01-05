@@ -3,6 +3,8 @@ import heliq
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 
 @pytest.fixture
 def offsetCylinder():
@@ -94,6 +96,7 @@ def test_helicalAxisPca_handlesMisalignedData(alignedCylinder):
     pytest.param(np.array((0, 0, 1)), np.array((0, 0, 0)), id="arrays"),
     pytest.param((0, 0, 1), (0, 0, 0), id="tuples"),
     pytest.param([0, 0, 1], [0, 0, 0], id="lists"),
+    pytest.param((0, 1, 0), (0, 0, 0), id="misaligned"),
 ])
 def test_alignHelicalAxis_handlesValidArgs(alignedCylinder, orientation, center):
     heliq.alignHelicalAxis(alignedCylinder, orientation, center)
@@ -140,3 +143,15 @@ def test_alignHelicalAxis_returnsSameShapeAsInput(alignedCylinder):
     assert aligned.dtype is alignedCylinder.dtype
     for i in range(3):
         assert aligned.shape[i] == alignedCylinder.shape[i]
+
+
+@pytest.mark.parametrize("orientation", [
+    pytest.param((0, 0, 1), id="prealigned"),
+    pytest.param((0, 1, 1), id="misaligned"),
+])
+def test_alignHelicalAxis_doesntChangeVolume(alignedCylinder, orientation):
+    center = [d / 2 for d in alignedCylinder.shape]
+    aligned = heliq.alignHelicalAxis(alignedCylinder, orientation, center)
+    # Volume is always going to change due to interpolation, just make sure
+    # that the object doesn't (partly) dissapear
+    assert np.sum(aligned) == pytest.approx(np.sum(alignedCylinder), rel=1e-2)
