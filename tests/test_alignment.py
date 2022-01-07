@@ -3,8 +3,6 @@ import heliq
 
 import numpy as np
 
-import matplotlib.pyplot as plt
-
 
 @pytest.fixture
 def offsetCylinder():
@@ -31,8 +29,8 @@ def test_centerOfMass_handlesValidInputArrays(offsetCylinder):
 
 @pytest.mark.parametrize("shape", [
     pytest.param((3,), id="1D"),
-    pytest.param((3,6), id="2D"),
-    pytest.param((2,2,9,1), id="4D"),
+    pytest.param((3, 6), id="2D"),
+    pytest.param((2, 2, 9, 1), id="4D"),
 ])
 def test_centerOfMass_handlesInvalidInputArrays(shape):
     with pytest.raises(ValueError):
