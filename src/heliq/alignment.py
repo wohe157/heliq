@@ -2,12 +2,12 @@
 To calculate the helicity of a certain object, it is important to make sure
 that the helical axis is aligned to the z-axis and is centered in the volume.
 This can be done by finding the center and orientation of your object and
-entering that information in ``alignHelicalAxis``. That function will rotate
+entering that information in ``align_helical_axis``. That function will rotate
 and translate your data such that the given orientation becomes parallel with
 the z-axis and is centered in the volume. You can find the orientation of the
 helical axis and the center either manually using external 3D visualization
 software, or for relatively simple objects these can also be found
-automatically using ``centerOfMass`` and/or ``helicalAxisPca``. The former
+automatically using ``center_of_mass`` and/or ``helical_axis_pca``. The former
 assumes that the helical axis goes through the center of mass of you object and
 will therefore select the center of mass as the center of the object. The
 latter assumes that the object is longer in one direction compared to the other
@@ -15,32 +15,33 @@ directions, and will use this direction as the helical axis. Don't use these
 functions if these assumptions are not correct for your object!
 """
 import numpy as np
-from scipy.ndimage import center_of_mass, map_coordinates
-from scipy.spatial.transform import Rotation
+import scipy.ndimage
+import scipy.spatial
+from typing import Sequence
 
 
-def centerOfMass(data: np.ndarray) -> np.ndarray:
-    """Calculate the center of mass of a 3D object
+def center_of_mass(data: np.ndarray) -> np.ndarray:
+    """Calculate the center of mass of a 3D object.
 
-    Arguments:
-        data (numpy array)
+    Args:
+        data:
             A 3D array containing the shape of an object. The shape of the
             array should correspond to the (y, x, z) axes.
 
     Returns:
-        numpy array
-            A vector of 3 elements (x, y, z) of the center of mass of the
-            object.
+        An array of 3 elements (x, y, z) of the center of mass of the object.
     """
     if data.ndim != 3:
         raise ValueError(("Expected a 3D input array, "
                           f"but got {data.ndim:d} dimensions."))
 
-    return np.asarray(center_of_mass(data))[[1, 0, 2]]
+    return np.asarray(scipy.ndimage.center_of_mass(data))[[1, 0, 2]]
 
 
-def helicalAxisPca(data: np.ndarray, threshold: float) -> np.ndarray:
-    """Estimate the orientation of the helical axis of a 3D object using PCA
+def helical_axis_pca(data: np.ndarray,
+                     threshold: float,
+                     ) -> np.ndarray:
+    """Estimate the orientation of the helical axis of a 3D object using PCA.
 
     The helical axis is assumed to be along the longest direction of the
     object. This is often true for rods, wires or similar shapes, but is not
@@ -53,18 +54,17 @@ def helicalAxisPca(data: np.ndarray, threshold: float) -> np.ndarray:
     will be oriented in the direction along which the points are spread the
     most. This is the direction along which the object is the longest.
 
-    Arguments:
-        data (numpy array)
+    Args:
+        data:
             A 3D array containing the shape of an object. The shape of the
             array should correspond to the (y, x, z) axes.
-        threshold (float)
+        threshold:
             The threshold that will be used to binarize the data. Only voxels
             with a value larger than this threshold will be used.
 
     Returns:
-        numpy array
-            A vector of 3 elements (x, y, z) of the orientation of the helical
-            axis.
+        An array of 3 elements (x, y, z) of the orientation of the helical
+        axis.
     """
     if data.ndim != 3:
         raise ValueError(("Expected a 3D input array, "
@@ -78,28 +78,29 @@ def helicalAxisPca(data: np.ndarray, threshold: float) -> np.ndarray:
     return orientation / np.linalg.norm(orientation)
 
 
-def alignHelicalAxis(data: np.ndarray, orientation: np.ndarray,
-                     center: np.ndarray) -> np.ndarray:
-    """Transform a 3D object to align its helical axis to the z-axis
+def align_helical_axis(data: np.ndarray,
+                       orientation: Sequence[float],
+                       center: Sequence[float],
+                       ) -> np.ndarray:
+    """Transform a 3D object to align its helical axis to the z-axis.
 
-    Arguments:
-        data (numpy array)
+    Args:
+        data:
             A 3D array containing the shape of a (helical) object. The shape
             of the array should correspond to the (y, x, z) axes.
-        orientation (numpy array or tuple or list)
+        orientation:
             A vector that points in the direction of the helical axis. The
             vector should be a numpy array, tuple or list with three components
             (x, y, z).
-        center (numpy array or tuple or list)
+        center:
             The location of the center of the object represented as a nnumpy
             array, tuple or list with components (x, y, z). This is typically
             the center of mass of the object.
 
     Returns:
-        numpy array
-            The transformed data. The helical axis of this object is parallel
-            with the z-axis and is positioned in the center of the array in
-            each dimension.
+        The transformed data. The helical axis of this object is parallel with
+        the z-axis and is positioned in the center of the array in each
+        dimension.
     """
     orientation = np.asarray(orientation)
     center = np.asarray(center)
@@ -133,7 +134,7 @@ def alignHelicalAxis(data: np.ndarray, orientation: np.ndarray,
     if angle > 1e-7:
         rvec = np.cross(zaxis, orientation)
         rvec = rvec * angle / np.linalg.norm(rvec)
-        rmat = Rotation.from_rotvec(rvec).as_matrix()
+        rmat = scipy.spatial.transform.Rotation.from_rotvec(rvec).as_matrix()
 
         xr = rmat[0, 0] * x + rmat[0, 1] * y + rmat[0, 2] * z
         yr = rmat[1, 0] * x + rmat[1, 1] * y + rmat[1, 2] * z
@@ -148,5 +149,5 @@ def alignHelicalAxis(data: np.ndarray, orientation: np.ndarray,
     y += center[1]
     z += center[2]
 
-    # Interpolate data
-    return map_coordinates(data, (y, x, z), order=1)  # linear interpolation
+    # Linearly interpolate data
+    return scipy.ndimage.map_coordinates(data, (y, x, z), order=1)
