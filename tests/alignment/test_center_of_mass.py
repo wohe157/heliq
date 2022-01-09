@@ -3,7 +3,7 @@ import heliq
 import numpy as np
 
 
-def test_handles_valid_input_arrays(offset_cylinder):
+def test_accepts_3d_array(offset_cylinder):
     heliq.center_of_mass(offset_cylinder[1])
 
 
@@ -12,7 +12,7 @@ def test_handles_valid_input_arrays(offset_cylinder):
     pytest.param((3, 6), id="2D"),
     pytest.param((2, 2, 9, 1), id="4D"),
 ])
-def test_handles_invalid_input_arrays(shape):
+def test_rejects_invalid_nd_array(shape):
     with pytest.raises(ValueError):
         heliq.center_of_mass(np.zeros(shape))
 

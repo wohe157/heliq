@@ -63,16 +63,15 @@ def helical_axis_pca(data: np.ndarray,
             with a value larger than this threshold will be used.
 
     Returns:
-        An array of 3 elements (x, y, z) of the orientation of the helical
-        axis.
+        An array of 3 elements (x, y, z) of the orientation of the estimated
+        helical axis.
     """
     if data.ndim != 3:
         raise ValueError(("Expected a 3D input array, "
                           f"but got {data.ndim:d} dimensions."))
 
     points = np.argwhere(data > threshold)[:, (1, 0, 2)]  # (y,x,z) to (x,y,z)
-    covariancematrix = np.cov(points.T)
-    eigval, eigvec = np.linalg.eig(covariancematrix)
+    eigval, eigvec = np.linalg.eig(np.cov(points.T))
 
     orientation = eigvec[:, np.argmax(eigval)]
     return orientation / np.linalg.norm(orientation)
@@ -113,18 +112,13 @@ def align_helical_axis(data: np.ndarray,
     if center.ndim != 1 or center.shape[0] != 3:
         raise ValueError(("Expected center to have shape (3,), "
                           f"but got {center.shape}."))
-    if np.linalg.norm(orientation) < 1e-7:
+    if np.linalg.norm(orientation) == 0:
         raise ValueError("The orientation must contain nonzero elements.")
 
     ymax, xmax, zmax = data.shape
-    x, y, z = np.meshgrid(np.arange(xmax, dtype=float),
-                          np.arange(ymax, dtype=float),
-                          np.arange(zmax, dtype=float))
-
-    # Translate such that origin is at middle of array
-    x -= xmax / 2
-    y -= ymax / 2
-    z -= zmax / 2
+    x, y, z = np.meshgrid(np.arange(xmax, dtype=float) - xmax / 2,
+                          np.arange(ymax, dtype=float) - ymax / 2,
+                          np.arange(zmax, dtype=float) - zmax / 2)
 
     # Rotate such that orientation is aligned with z-axis
     orientation = orientation / np.linalg.norm(orientation)
@@ -135,14 +129,9 @@ def align_helical_axis(data: np.ndarray,
         rvec = np.cross(zaxis, orientation)
         rvec = rvec * angle / np.linalg.norm(rvec)
         rmat = scipy.spatial.transform.Rotation.from_rotvec(rvec).as_matrix()
-
-        xr = rmat[0, 0] * x + rmat[0, 1] * y + rmat[0, 2] * z
-        yr = rmat[1, 0] * x + rmat[1, 1] * y + rmat[1, 2] * z
-        zr = rmat[2, 0] * x + rmat[2, 1] * y + rmat[2, 2] * z
-
-        x = xr
-        y = yr
-        z = zr
+        x, y, z = (rmat[0, 0] * x + rmat[0, 1] * y + rmat[0, 2] * z,
+                   rmat[1, 0] * x + rmat[1, 1] * y + rmat[1, 2] * z,
+                   rmat[2, 0] * x + rmat[2, 1] * y + rmat[2, 2] * z)
 
     # Translate such that center is at origin
     x += center[0]

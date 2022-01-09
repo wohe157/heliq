@@ -57,7 +57,7 @@ def helicity_descriptor(data: np.ndarray,
     if data.ndim != 3:
         raise ValueError(("The data has to be a 3D array, "
                           f"but a {data.ndim}D array was given."))
-    if data.max() == data.min():
+    if np.max(data) == np.min(data):
         raise ValueError(("The data cannot be a uniform array, "
                           "make sure that data.max() != data.min()."))
     if kernel_size <= 1:
@@ -133,9 +133,7 @@ def helicity_function(data: np.ndarray,
     max_rho = float(min(data.shape[:2]))
     rho_edges_left = np.arange(0., max_rho, delta_rho)  # right = left + delta
     alpha_edges_left = np.arange(0., 90., delta_alpha)
-    nbins_rho = len(rho_edges_left)
-    nbins_alpha = len(alpha_edges_left)
-    bins = np.zeros((nbins_rho, nbins_alpha), dtype=float)
+    bins = np.zeros((len(rho_edges_left), len(alpha_edges_left)), dtype=float)
 
     for i, rho_edge_left in enumerate(rho_edges_left):
         for j, alpha_edge_left in enumerate(alpha_edges_left):
