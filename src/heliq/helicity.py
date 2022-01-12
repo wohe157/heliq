@@ -77,6 +77,9 @@ def helicity_descriptor(data: np.ndarray,
     # prevent division by zero, of which the result should be zero in this case
     sr[sr == 0] = np.Inf
 
+    # For some reason, this custom implementation that doesn't use the
+    # separability of the Sobel kernel is about 2x faster than the Scipy
+    # implementation
     gx = scipy.ndimage.convolve(data, sx / sr)
     gy = scipy.ndimage.convolve(data, sy / sr)
     gz = scipy.ndimage.convolve(data, sz / sr)
