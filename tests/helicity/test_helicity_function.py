@@ -7,26 +7,8 @@ def test_accepts_positive_delta_rho():
     heliq.helicity_function(np.random.standard_normal((2, 2, 2)), delta_rho=3.1)
 
 
-@pytest.mark.parametrize("delta_rho", [
-    pytest.param(0, id="zero"),
-    pytest.param(-1, id="negative"),
-])
-def test_rejects_negative_delta_rho(delta_rho):
-    with pytest.raises(ValueError):
-        heliq.helicity_function(np.random.standard_normal((2, 2, 2)), delta_rho=delta_rho)
-
-
 def test_accepts_positive_delta_alpha():
     heliq.helicity_function(np.random.standard_normal((2, 2, 2)), delta_alpha=3)
-
-
-@pytest.mark.parametrize("delta_alpha", [
-    pytest.param(0, id="zero"),
-    pytest.param(-1, id="negative"),
-])
-def test_rejects_negative_delta_alpha(delta_alpha):
-    with pytest.raises(ValueError):
-        heliq.helicity_function(np.random.standard_normal((2, 2, 2)), delta_alpha=delta_alpha)
 
 
 def test_returns_helicityfunction_object():

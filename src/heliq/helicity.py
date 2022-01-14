@@ -25,6 +25,7 @@ from matplotlib.image import AxesImage
 from typing import Tuple
 
 
+# TODO Cython doesn't work properly with dataclasses yet
 @dataclasses.dataclass
 class HelicityFunction:
     """Holds the contents of a helicity function."""
@@ -54,16 +55,9 @@ def helicity_descriptor(data: np.ndarray,
         in each voxel and the second element is the inclination angle in
         degrees in each voxel.
     """
-    if data.ndim != 3:
-        raise ValueError(("The data has to be a 3D array, "
-                          f"but a {data.ndim}D array was given."))
-    if np.max(data) == np.min(data):
-        raise ValueError(("The data cannot be a uniform array, "
-                          "make sure that data.max() != data.min()."))
-    if kernel_size <= 1:
-        raise ValueError("kernel_size must be greater than 1.")
-    if kernel_size % 2 != 1:
-        raise ValueError("kernel_size must be an odd integer.")
+    assert data.ndim == 3
+    assert np.max(data) > np.min(data)
+    assert kernel_size > 1 and kernel_size % 2 == 1
 
     x, y, z = np.meshgrid(np.arange(data.shape[1]) - data.shape[1] / 2,
                           np.arange(data.shape[0]) - data.shape[0] / 2,
@@ -114,10 +108,8 @@ def helicity_function(data: np.ndarray,
     Returns:
         A ``HelicityFunction`` containing the results.
     """
-    if delta_alpha <= 0:
-        raise ValueError("delta_alpha must be positive.")
-    if delta_rho <= 0:
-        raise ValueError("delta_rho must be positive.")
+    assert delta_alpha > 0
+    assert delta_rho > 0
 
     # For binning we need the inclination angle and gradient magnitude, but the
     # gradient magnitude should have the correct sign (+ for right-handed and -
@@ -183,8 +175,7 @@ def plot_helicity_function(hfunc: HelicityFunction,
     if axis is None:
         axis = plt.gca()
 
-    if vmax <= 0:
-        raise ValueError("vmax must be positive.")
+    assert vmax > 0
 
     im = axis.imshow(hfunc.histogram,
                      interpolation='nearest',
@@ -239,8 +230,7 @@ def helicity_map(data: np.ndarray,
         A 3D array with the same shape as ``data`` that contains the 3D
         helicity map.
     """
-    if sigma < 0:
-        raise ValueError("sigma should be positive.")
+    assert sigma >= 0
 
     gmag, alpha = helicity_descriptor(data, kernel_size)
     hmap = scipy.ndimage.gaussian_filter(gmag * np.sign(alpha), sigma, mode='constant')

@@ -14,15 +14,6 @@ def test_applies_vmax(hfunc):
     assert vmax == pytest.approx(1)
 
 
-@pytest.mark.parametrize("vmax", [
-    pytest.param(0, id="zero"),
-    pytest.param(-12, id="negative"),
-])
-def test_rejects_nonpositive_vmax(hfunc, vmax):
-    with pytest.raises(ValueError):
-        heliq.plot_helicity_function(hfunc, vmax=vmax)
-
-
 def test_uses_correct_data(hfunc):
     im = heliq.plot_helicity_function(hfunc)
     assert np.all(np.abs(hfunc.histogram - im.get_array()) < 1e-7)

@@ -7,16 +7,6 @@ def test_accepts_3d_array(aligned_cylinder):
     heliq.helical_axis_pca(aligned_cylinder, 0.5)
 
 
-@pytest.mark.parametrize("shape", [
-    pytest.param((3,), id="1D"),
-    pytest.param((3, 6), id="2D"),
-    pytest.param((2, 2, 9, 1), id="4D"),
-])
-def test_rejects_invalid_nd_array(shape):
-    with pytest.raises(ValueError):
-        heliq.helical_axis_pca(np.zeros(shape), 0.5)
-
-
 def test_returns_array(aligned_cylinder):
     orientation = heliq.helical_axis_pca(aligned_cylinder, 0.5)
     assert type(orientation) is np.ndarray

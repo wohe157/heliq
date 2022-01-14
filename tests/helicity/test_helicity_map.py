@@ -12,11 +12,6 @@ def test_accepts_positive_sigma(sigma):
     heliq.helicity_map(np.random.standard_normal((2, 2, 2)), sigma)
 
 
-def test_rejects_negative_sigma():
-    with pytest.raises(ValueError):
-        heliq.helicity_map(np.random.standard_normal((2, 2, 2)), -0.5)
-
-
 @pytest.mark.parametrize("threshold", [
     pytest.param(0, id="zero"),
     pytest.param(0.5, id="positive"),

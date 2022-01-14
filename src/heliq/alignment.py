@@ -14,10 +14,12 @@ latter assumes that the object is longer in one direction compared to the other
 directions, and will use this direction as the helical axis. Don't use these
 functions if these assumptions are not correct for your object!
 """
-import numpy as np
-import scipy.ndimage
-import scipy.spatial
 from typing import Sequence
+
+from scipy import ndimage
+from scipy import spatial
+
+import numpy as np
 
 
 def center_of_mass(data: np.ndarray) -> np.ndarray:
@@ -31,11 +33,8 @@ def center_of_mass(data: np.ndarray) -> np.ndarray:
     Returns:
         An array of 3 elements (x, y, z) of the center of mass of the object.
     """
-    if data.ndim != 3:
-        raise ValueError(("Expected a 3D input array, "
-                          f"but got {data.ndim:d} dimensions."))
-
-    return np.asarray(scipy.ndimage.center_of_mass(data))[[1, 0, 2]]
+    assert data.ndim == 3
+    return np.asarray(ndimage.center_of_mass(data))[[1, 0, 2]]
 
 
 def helical_axis_pca(data: np.ndarray,
@@ -66,9 +65,7 @@ def helical_axis_pca(data: np.ndarray,
         An array of 3 elements (x, y, z) of the orientation of the estimated
         helical axis.
     """
-    if data.ndim != 3:
-        raise ValueError(("Expected a 3D input array, "
-                          f"but got {data.ndim:d} dimensions."))
+    assert data.ndim == 3
 
     points = np.argwhere(data > threshold)[:, (1, 0, 2)]  # (y,x,z) to (x,y,z)
     eigval, eigvec = np.linalg.eig(np.cov(points.T))
@@ -103,17 +100,10 @@ def align_helical_axis(data: np.ndarray,
     """
     orientation = np.asarray(orientation)
     center = np.asarray(center)
-    if data.ndim != 3:
-        raise ValueError(("Expected data to be a 3D input array, "
-                          f"but got {data.ndim:d} dimensions."))
-    if orientation.ndim != 1 or orientation.shape[0] != 3:
-        raise ValueError(("Expected orientation to have shape (3,), "
-                          f"but got {orientation.shape}."))
-    if center.ndim != 1 or center.shape[0] != 3:
-        raise ValueError(("Expected center to have shape (3,), "
-                          f"but got {center.shape}."))
-    if np.linalg.norm(orientation) == 0:
-        raise ValueError("The orientation must contain nonzero elements.")
+    assert data.ndim == 3
+    assert orientation.ndim == 1 and orientation.shape[0] == 3
+    assert center.ndim == 1 and center.shape[0] == 3
+    assert np.linalg.norm(orientation) > 0
 
     ymax, xmax, zmax = data.shape
     x, y, z = np.meshgrid(np.arange(xmax, dtype=float) - xmax / 2,
@@ -128,7 +118,7 @@ def align_helical_axis(data: np.ndarray,
     if angle > 1e-7:
         rvec = np.cross(zaxis, orientation)
         rvec = rvec * angle / np.linalg.norm(rvec)
-        rmat = scipy.spatial.transform.Rotation.from_rotvec(rvec).as_matrix()
+        rmat = spatial.transform.Rotation.from_rotvec(rvec).as_matrix()
         x, y, z = (rmat[0, 0] * x + rmat[0, 1] * y + rmat[0, 2] * z,
                    rmat[1, 0] * x + rmat[1, 1] * y + rmat[1, 2] * z,
                    rmat[2, 0] * x + rmat[2, 1] * y + rmat[2, 2] * z)
@@ -139,4 +129,4 @@ def align_helical_axis(data: np.ndarray,
     z += center[2]
 
     # Linearly interpolate data
-    return scipy.ndimage.map_coordinates(data, (y, x, z), order=1)
+    return ndimage.map_coordinates(data, (y, x, z), order=1)
