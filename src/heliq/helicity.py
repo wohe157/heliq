@@ -19,8 +19,8 @@ inclination angle.
 """
 import numpy as np
 import dataclasses
-import scipy.ndimage
 import matplotlib.pyplot as plt
+from scipy import ndimage
 from matplotlib.image import AxesImage
 from typing import Tuple
 
@@ -57,9 +57,9 @@ def _gradient_3d(data, kernel_size):
     # For some reason, this custom implementation that doesn't use the
     # separability of the Sobel kernel is about 2x faster than the Scipy
     # implementation
-    gx = scipy.ndimage.convolve(data, sx / sr)
-    gy = scipy.ndimage.convolve(data, sy / sr)
-    gz = scipy.ndimage.convolve(data, sz / sr)
+    gx = ndimage.convolve(data, sx / sr)
+    gy = ndimage.convolve(data, sy / sr)
+    gz = ndimage.convolve(data, sz / sr)
     return gx, gy, gz
 
 
@@ -138,6 +138,13 @@ def helicity_function(data: np.ndarray,
     gmag, alpha = helicity_descriptor(data, kernel_size)
     gmag *= np.sign(alpha)
     alpha = np.abs(alpha)
+
+    # Currently, alpha is defined in the range [0°, 90°], but the binning only
+    # works for [0°, 90°), the next line deals with values of 90°.
+    alpha[alpha == 90] -= 1e-6
+
+    assert alpha.min() >= 0
+    assert alpha.max() < 90
 
     rho, _, _ = _cylindrical_coordinates(data.shape)
     rho *= voxel_size
@@ -250,7 +257,7 @@ def helicity_map(data: np.ndarray,
     assert sigma >= 0
 
     gmag, alpha = helicity_descriptor(data, kernel_size)
-    hmap = scipy.ndimage.gaussian_filter(gmag * np.sign(alpha), sigma, mode='constant')
+    hmap = ndimage.gaussian_filter(gmag * np.sign(alpha), sigma, mode='constant')
 
     if threshold is not None:
         hmap[data < threshold] = 0
