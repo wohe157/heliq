@@ -1,10 +1,6 @@
 HeliQ
 =====
 
-.. image:: https://img.shields.io/github/license/wohe157/heliq?color=blue
-   :target:
-
-
 Quantification of helical morphologies
 
 * Home: `github.com/wohe157/heliq <https://github.com/wohe157/heliq>`_
@@ -18,7 +14,3 @@ Installation
 From PyPI::
 
     pip install heliq
-
-From Anaconda::
-
-    conda install plogpro -c wohe
