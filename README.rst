@@ -1,6 +1,10 @@
 HeliQ
 =====
 
+.. image:: https://img.shields.io/github/license/wohe157/heliq?color=blue
+   :target:
+
+
 Quantification of helical morphologies
 
 * Home: `github.com/wohe157/heliq <https://github.com/wohe157/heliq>`_
