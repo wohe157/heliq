@@ -58,7 +58,7 @@ htot = heliq.total_helicity(hfunc)
 fig, ax = plt.subplots(1, 1)
 im = heliq.plot_helicity_function(hfunc, axis=ax)
 fig.colorbar(im)
-ax.set_title("Helicity function")
+ax.set_title(f"Helicity function (H={htot:0.2f})")
 ax.set_xlabel("Inclination angle [degrees]")
 ax.set_ylabel("Distance to helical axis [voxels]")
 
