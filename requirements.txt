@@ -1,7 +1,9 @@
 numpy
 scipy
 matplotlib
+flake8
 pytest
+coverage
 setuptools
 sphinx
 sphinx-rtd-theme
