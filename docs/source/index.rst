@@ -11,6 +11,7 @@ Welcome to HeliQ's documentation!
    :caption: Contents:
    :glob:
 
+   installation
    api/*
 
 
