@@ -11,7 +11,7 @@ Quantification of helical morphologies
 Installation
 ------------
 
-From PyPI::
+From PyPI:
 
 ```shell
 pip install heliq
