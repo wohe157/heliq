@@ -1,3 +1,7 @@
+[![PyPI](https://img.shields.io/pypi/v/heliq?label=PyPI)](https://pypi.org/project/heliq/)
+[![Read the Docs (version)](https://img.shields.io/readthedocs/heliq/stable?label=Docs)](https://heliq.readthedocs.io/en/stable/?badge=stable)
+![Tests](https://img.shields.io/github/workflow/status/wohe157/heliq/Test?label=Tests)
+
 HeliQ
 =====
 
