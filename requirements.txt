@@ -3,6 +3,7 @@ scipy
 matplotlib
 flake8
 pytest
+pytest-cov
 coverage
 setuptools
 sphinx
