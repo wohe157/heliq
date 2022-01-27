@@ -95,7 +95,7 @@ def helicity_descriptor(data: np.ndarray,
     alpha = 90 + np.arctan2(gz, gphi) * 180 / np.pi
     alpha[alpha > 90] -= 180
     gmag = np.sqrt(gphi ** 2 + gz ** 2)
-    gmag /= np.sum(np.abs(gmag))
+    gmag /= np.sum(np.sqrt(gx ** 2 + gy ** 2 + gz ** 2))
     return gmag, alpha
 
 
