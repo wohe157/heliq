@@ -9,11 +9,11 @@ helical features of a structure.
 import numpy as np
 
 from scipy import ndimage
-from typing import Sequence
+from typing import Union, Sequence
 
 
 def cylindrical_sections(data: np.ndarray,
-                         rho: float | Sequence[float] = None,
+                         rho: Union[float, Sequence[float]] = None,
                          n_theta: int = 360,
                          ) -> np.ndarray:
     """Get cylindrical sections from a volume in Cartesian coordinates
