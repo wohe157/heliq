@@ -7,7 +7,9 @@ Welcome to HeliQ's documentation!
    :glob:
 
    installation
-   api/*
+   api/alignment
+   api/helicity
+   api/cylindrical
 
 
 .. toctree::
@@ -15,7 +17,8 @@ Welcome to HeliQ's documentation!
    :caption: Examples:
    :glob:
 
-   examples/*
+   examples/alignment_and_analysis
+   examples/cylindrical_sections
 
 
 Indices and tables
