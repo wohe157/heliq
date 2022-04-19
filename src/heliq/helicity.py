@@ -166,7 +166,7 @@ def helicity_function(data: np.ndarray,
     # possible to compare intensities between helicity functions with different
     # bin sizes. This does not influence the total helicity, because it takes
     # this into account already in the integration.
-    bins /= (voxel_size * delta_rho * delta_alpha)
+    bins /= delta_rho * delta_alpha
     return HelicityFunction(delta_alpha, delta_rho, bins)
 
 
